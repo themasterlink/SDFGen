@@ -1,6 +1,7 @@
 #include <iostream>
 #include <tclap/CmdLine.h>
 #include "obj/ObjReader.h"
+#include "container/Array3D.h"
 
 
 int main(int argc, char **argv) {
@@ -10,6 +11,8 @@ int main(int argc, char **argv) {
 	TCLAP::ValueArg<std::string> objFile("o", "obj",
 										 "File path to the obj file", required,
 										 "", "string");
+
+	Array3D<double> arr({5,5,5});
 
 
 	cmd.add(objFile);

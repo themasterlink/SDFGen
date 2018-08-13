@@ -9,7 +9,7 @@
 #include <iostream>
 
 template<typename dataType>
-class Point{
+class Point {
 public:
 
 	using InternalStorage = std::array<dataType, 3>;
@@ -23,6 +23,9 @@ public:
 	Point(InternalStorage&& data) : m_data(std::move(data)){};
 
 	Point(dataType x, dataType y, dataType z) : m_data({x, y, z}){};
+
+	template<typename differentType>
+	Point(const Point<differentType>& rhs);
 
 	dataType& operator[](int i){ return m_data[i]; }
 
@@ -54,20 +57,57 @@ using iPoint = Point<int>;
 using uiPoint = Point<unsigned int>;
 
 
-class Point3D : public Point<double>{
+class Point3D : public Point<double> {
 public:
 
-	Point3D(): Point(), m_index(0) {};
+	Point3D() : Point(), m_index(0), m_used(true){};
 
-	Point3D(double x, double y, double z, unsigned int index) : Point<double>(x, y, z), m_index(index){};
+	Point3D(double x, double y, double z, unsigned int index) : Point<double>(x, y, z), m_index(index), m_used(true){};
 
 	unsigned int getIndex();
 
 	void setIndex(unsigned int index){ m_index = index; };
 
+	bool used(){ return m_used; }
+
+	void setUsed(bool used){ m_used = used; }
+
 private:
 	unsigned int m_index;
+
+	bool m_used;
 };
+
+#define POINT_CMP_FCT(lhs, rhs, op, outputType) \
+    outputType point; \
+    for(unsigned int i = 0; i < 3; ++i){ \
+        point[i] = lhs[i] op rhs[i] ? lhs[i] : rhs[i]; \
+    } \
+
+
+template<typename dataType, typename differentType>
+static Point<dataType> eMax(const Point<dataType>& lhs, const Point<differentType>& rhs){
+	POINT_CMP_FCT(lhs, rhs, >, Point<dataType>);
+	return point;
+}
+
+template<typename dataType, typename differentType>
+static Point<dataType> eMin(const Point<dataType>& lhs, const Point<differentType>& rhs){
+	POINT_CMP_FCT(lhs, rhs, <, Point<dataType>);
+	return point;
+}
+
+template<typename dataType, typename differentType>
+static Point<dataType> eMinEqual(const Point<dataType>& lhs, const Point<differentType>& rhs){
+	POINT_CMP_FCT(lhs, rhs, <=, Point<dataType>);
+	return point;
+}
+
+template<typename dataType, typename differentType>
+static Point<dataType> eMaxEqual(const Point<dataType>& lhs, const Point<differentType>& rhs){
+	POINT_CMP_FCT(lhs, rhs, >=, Point<dataType>);
+	return point;
+}
 
 #define __POINT_INTERNAL__
 

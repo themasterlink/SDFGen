@@ -12,7 +12,7 @@
 
 template<typename dataType>
 std::ostream& operator<<(std::ostream& os, const Point<dataType>& point){
-	os << point[0] << ", " << point[1] << ", " << point[2];
+	os << "[" << point[0] << ", " << point[1] << ", " << point[2] << "]";
 	return os;
 }
 
@@ -23,6 +23,14 @@ std::istream& operator>>(std::istream& in, Point<dataType>& point){
 	}
 	return in;
 }
+
+template<typename dataType>
+template<typename differentType>
+Point<dataType>::Point(const Point<differentType>& rhs){
+	for(unsigned int i = 0; i < 3; ++i){
+		this->m_data[i] = (dataType) rhs[i];
+	}
+};
 
 #define rhsOperatorFunction(op) \
     m_data[0] op rhs.m_data[0], m_data[1] op rhs.m_data[1], m_data[2] op rhs.m_data[2]

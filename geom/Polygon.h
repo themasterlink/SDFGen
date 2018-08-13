@@ -17,6 +17,8 @@ public:
 
 	std::vector<Point3D*>& getPoints(){ return m_points; }
 
+	const std::vector<Point3D*>& getPoints() const { return m_points; }
+
 private:
 	std::vector<Point3D*> m_points;
 };

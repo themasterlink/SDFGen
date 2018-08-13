@@ -20,5 +20,13 @@
 	printDetailedMsg(msg, "Error in ") \
 
 
+namespace Utility {
+	template<typename type>
+	static void destroy(type*& ptr){
+		delete ptr;
+		ptr = nullptr;
+	}
+}
+
 
 #endif //SDFGEN_UTILITY_H
