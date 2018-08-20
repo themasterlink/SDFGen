@@ -14,7 +14,14 @@ int main(int argc, char **argv) {
 
 	Array3D<double> arr({5,5,5});
 
-
+	Point3D* p1 = new Point3D(0,0,0,0);
+	Point3D* p2 = new Point3D(2,0,0,1);
+	Point3D* p3 = new Point3D(1,1,0,2);
+	std::vector<Point3D*> points = {p2, p3, p1};
+	Polygon p(points);
+	auto dist = p.calcDistance({0,0,1});
+	printMsg(dist);
+	exit(0);
 	cmd.add(objFile);
 	cmd.parse(argc, argv);
 

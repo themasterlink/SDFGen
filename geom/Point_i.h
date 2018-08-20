@@ -39,22 +39,22 @@ Point<dataType>::Point(const Point<differentType>& rhs){
     m_data[0] op rhs, m_data[1] op rhs, m_data[2] op rhs
 
 template<typename dataType>
-Point<dataType> Point<dataType>::operator+(const Point<dataType>& rhs){
+Point<dataType> Point<dataType>::operator+(const Point<dataType>& rhs) const{
 	return {rhsOperatorFunction(+)};
 }
 
 template<typename dataType>
-Point<dataType> Point<dataType>::operator-(const Point<dataType>& rhs){
+Point<dataType> Point<dataType>::operator-(const Point<dataType>& rhs) const{
 	return {rhsOperatorFunction(-)};
 }
 
 template<typename dataType>
-Point<dataType> Point<dataType>::operator/(dataType rhs){
+Point<dataType> Point<dataType>::operator/(dataType rhs) const{
 	return {rhsOperatorFunctionSingle(/)};
 }
 
 template<typename dataType>
-Point<dataType> Point<dataType>::operator*(dataType rhs){
+Point<dataType> Point<dataType>::operator*(dataType rhs) const{
 	return {rhsOperatorFunctionSingle(*)};
 }
 
