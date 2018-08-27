@@ -13,6 +13,8 @@
 class Space {
 public:
 
+	Space(const uiPoint& iSize, const dPoint& origin, const dPoint& size): m_data(iSize), m_origin(origin), m_size(size) {};
+
 	void calcDists(std::vector<Polygon>& polys);
 
 

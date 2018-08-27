@@ -11,6 +11,7 @@
 #include "../geom/Point.h"
 #include <vector>
 #include "../geom/Polygon.h"
+#include "../geom/BoundingBox.h"
 
 class ObjReader {
 public:
@@ -18,9 +19,15 @@ public:
 
 	void read(const std::string& filePath);
 
+	std::vector<Polygon>& getPolygon(){ return m_polygons; }
+
+	BoundingBox& getBoundingBox() { return m_box; }
+
 private:
 	std::vector<Point3D> m_points;
 	std::vector<Polygon> m_polygons;
+
+	BoundingBox m_box;
 
 	bool startsWith(const std::string& line, const std::string& start);
 

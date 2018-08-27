@@ -15,25 +15,32 @@ Polygon::Polygon(const iPoint& indices, std::vector<Point3D>& pointsRef) : m_cal
 double Polygon::calcDistance(const dPoint& point){
 	if(m_calcNormal){
 		double dist = m_main.getDist(point);
-		printVar(dist);
-		std::array<double, 3> newDists;
+		std::array<double, 3> newDists = {0,0,0};
 		for(unsigned int i = 0; i < 3; ++i){
 			newDists[i] = m_edgePlanes[i].getDist(point);
 		}
-		bool isInside = true;
+		int insideCounter = 0;
 		for(const auto& val : newDists){
 			if(val < 0){
-				isInside = false;
-				break;
+				++insideCounter;
 			}
 		}
-		if(!isInside){
-			return 0;
-			dist = DBL_MAX;
+		if(insideCounter == 1){
 			for(unsigned int i = 0; i < 3; ++i){
-				printVar(m_edgeLines[i].getDist(point));
-				dist = std::min(dist, m_edgeLines[i].getDist(point));
+				if(newDists[i] < 0){
+					return m_edgeLines[i].getDist(point);
+				}
 			}
+		}else if(insideCounter == 2){
+			// dist to the point between the two lines
+			int usedPointIndex = -1;
+			for(unsigned int i = 0; i < 3; ++i){
+				if(newDists[i] >= 0){
+					usedPointIndex = i; // it is always the smallest number
+					break;
+				}
+			}
+			return (point - *m_points[usedPointIndex]).length();
 		}
 		return dist;
 	}else{
@@ -69,7 +76,7 @@ void Polygon::calcNormal(){
 			}
 			normal.normalizeThis();
 			m_edgePlanes[edgeId] = Plane(normal, *m_points[(edgeId + 1) % 3]);
-			m_edgeLines[edgeId] = Line(*m_points[edgeId], *m_points[(edgeId + 1) % 3]);
+			m_edgeLines[edgeId] = Line(*m_points[(edgeId + 2) % 3], *m_points[(edgeId + 1) % 3]);
 		}
 		m_calcNormal = true;
 	}else{

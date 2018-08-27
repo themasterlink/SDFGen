@@ -2,19 +2,24 @@
 // Created by Maximilian Denninger on 15.08.18.
 //
 
+#include <cfloat>
 #include "Space.h"
 
 
 void Space::calcDists(std::vector<Polygon>& polys){
+	printVar(polys.size());
 	const auto size = m_data.getSize();
 	for(unsigned int i = 0; i < size[0]; ++i){
+		printVar(i);
 		for(unsigned int j = 0; j < size[1]; ++j){
 			for(unsigned int k = 0; k < size[2]; ++k){
 				const dPoint point = getCenterOf(i,j,k);
+				double minDist = DBL_MAX;
 				for(auto& poly : polys){
 					double dist = poly.calcDistance(point);
-
+					minDist = std::min(dist, minDist);
 				}
+				m_data(i,j,k) = minDist;
 			}
 		}
 	}

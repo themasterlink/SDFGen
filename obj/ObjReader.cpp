@@ -3,13 +3,11 @@
 //
 
 #include "ObjReader.h"
-#include "../geom/BoundingBox.h"
 #include <sstream>
 
 
 void ObjReader::read(const std::string& filePath){
 	std::ifstream stream(filePath);
-	BoundingBox box;
 	if(stream.is_open()){
 		std::string line;
 		while(std::getline(stream, line)){
@@ -35,10 +33,10 @@ void ObjReader::read(const std::string& filePath){
 				iPoint pointIds;
 				ss >> pointIds;
 				m_polygons.emplace_back(pointIds, m_points);
-				box.addPolygon(m_polygons.back());
+				m_box.addPolygon(m_polygons.back());
 			}
 		}
-		std::cout << box << std::endl;
+		std::cout << m_box << std::endl;
 	}else{
 		printError("File \"" << filePath << "\" could not be read");
 	}

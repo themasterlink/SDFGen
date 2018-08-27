@@ -2,6 +2,7 @@
 #include <tclap/CmdLine.h>
 #include "obj/ObjReader.h"
 #include "container/Array3D.h"
+#include "container/Space.h"
 
 
 int main(int argc, char **argv) {
@@ -16,20 +17,17 @@ int main(int argc, char **argv) {
 
 
 
-	auto* p1 = new Point3D(0,0,0,0);
-	auto* p2 = new Point3D(2,0,1,1);
-	auto* p3 = new Point3D(1,1,2,2);
-	std::vector<Point3D*> points = {p2, p3, p1};
-	Polygon p(points);
-	auto dist = p.calcDistance({1,1,1});
-	printMsg(dist);
-	exit(0);
 	cmd.add(objFile);
 	cmd.parse(argc, argv);
 
 	ObjReader reader;
 
 	reader.read(objFile.getValue());
+
+	BoundingBox& box = reader.getBoundingBox();
+	unsigned int res = 128;
+	Space space({res, res, res}, box.min(), box.max() - box.min());
+	space.calcDists(reader.getPolygon());
 
 	std::cout << "Done" << std::endl;
 	return 0;

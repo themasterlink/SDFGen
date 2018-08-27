@@ -8,20 +8,33 @@
 #include <iostream>
 #include <math.h>
 
+#define printPrettyFunction() \
+	__PRETTY_FUNCTION__ << "::" << __LINE__ \
+
 #define printDetailedMsg(msg, prefix) \
-	std::cout << prefix << __PRETTY_FUNCTION__ << "::" << __LINE__ << ": " << msg << std::endl \
+	std::cout << prefix << printPrettyFunction() << ": " << msg << std::endl \
 
 #define printMsg(msg) \
 	printDetailedMsg(msg, "") \
 
+#define varCore(var) \
+	#var ": " << var \
+
 #define printVar(var) \
-	printDetailedMsg(#var ": " <<  var, "") \
+	printDetailedMsg(varCore(var), "") \
+
+#define printVars(var1, var2) \
+	printDetailedMsg(varCore(var1) << ", " varCore(var2), "")
+
 
 #define printQuote(msg) \
 	printMsg("\"" << msg << "\"") \
 
 #define printError(msg) \
 	printDetailedMsg(msg, "Error in ") \
+
+#define printLine() \
+	std::cout << "In: " << printPrettyFunction() << std::endl; \
 
 
 namespace Utility {

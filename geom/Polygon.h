@@ -25,7 +25,7 @@ struct Plane {
 	}
 
 	void calcNormalDist(const dPoint& pointOnPlane){
-		m_dist = -dot(m_normal, pointOnPlane);
+		m_dist = dot(m_normal, pointOnPlane);
 	}
 
 	double getDist(const dPoint& point) const {
@@ -44,7 +44,6 @@ struct Line {
 	Line(Point3D& first, Point3D& second): m_first(&first), m_second(&second) {
 		m_normal = *m_second - *m_first;
 		m_normal.normalizeThis();
-		printVar(m_normal);
 	};
 
 	double getDist(const dPoint& toPoint){
