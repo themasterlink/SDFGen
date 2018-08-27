@@ -2,6 +2,7 @@
 // Created by Maximilian Denninger on 13.08.18.
 //
 
+#include <cfloat>
 #include "Polygon.h"
 #include "../util/Utility.h"
 
@@ -14,7 +15,26 @@ Polygon::Polygon(const iPoint& indices, std::vector<Point3D>& pointsRef) : m_cal
 double Polygon::calcDistance(const dPoint& point){
 	if(m_calcNormal){
 		double dist = m_main.getDist(point);
-		// add all the edge dists
+		printVar(dist);
+		std::array<double, 3> newDists;
+		for(unsigned int i = 0; i < 3; ++i){
+			newDists[i] = m_edgePlanes[i].getDist(point);
+		}
+		bool isInside = true;
+		for(const auto& val : newDists){
+			if(val < 0){
+				isInside = false;
+				break;
+			}
+		}
+		if(!isInside){
+			return 0;
+			dist = DBL_MAX;
+			for(unsigned int i = 0; i < 3; ++i){
+				printVar(m_edgeLines[i].getDist(point));
+				dist = std::min(dist, m_edgeLines[i].getDist(point));
+			}
+		}
 		return dist;
 	}else{
 		calcNormal();
@@ -35,7 +55,7 @@ void Polygon::calcNormal(){
 
 		// edgeId = 0 -> edge between 0 and 1
 		for(unsigned int edgeId = 0; edgeId < 3; ++edgeId){
-			const auto first = *m_points[(edgeId+ 2) % 3] - *m_points[(edgeId + 1) % 3];
+			const auto first = *m_points[(edgeId + 2) % 3] - *m_points[(edgeId + 1) % 3];
 			const auto second = *m_points[(edgeId) % 3] - *m_points[(edgeId + 1) % 3];
 			const double alpha = acos(dot(first, second) / (first.length() * second.length()));
 			dPoint normal;
@@ -43,12 +63,13 @@ void Polygon::calcNormal(){
 				const double length = cos(alpha) * second.length();
 				const auto dir = first.normalize();
 				auto newPoint = dir * length + *m_points[(edgeId + 1) % 3];
-				normal = *m_points[(edgeId)%3] - newPoint;
+				normal = *m_points[(edgeId) % 3] - newPoint;
 			}else{ // they are perpendicular
 				normal = second;
 			}
 			normal.normalizeThis();
-			m_edgePlanes[edgeId] =  Plane(normal, *m_points[(edgeId + 1) % 3]);
+			m_edgePlanes[edgeId] = Plane(normal, *m_points[(edgeId + 1) % 3]);
+			m_edgeLines[edgeId] = Line(*m_points[edgeId], *m_points[(edgeId + 1) % 3]);
 		}
 		m_calcNormal = true;
 	}else{

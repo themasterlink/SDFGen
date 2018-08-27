@@ -20,18 +20,25 @@ public:
 
 	Point() : m_data({0, 0, 0}){};
 
-	Point(InternalStorage data) : m_data(std::move(data)){};
+	explicit Point(InternalStorage data) : m_data(std::move(data)){};
 
-	Point(InternalStorage&& data) : m_data(std::move(data)){};
+	explicit Point(InternalStorage&& data) : m_data(std::move(data)){};
+
+	Point(const Point<dataType>& rhs): m_data(rhs.m_data) {};
+
+	Point(Point<dataType>&& rhs): m_data(std::move(rhs.m_data)) {};
 
 	Point(dataType x, dataType y, dataType z) : m_data({x, y, z}){};
 
 	template<typename differentType>
-	Point(const Point<differentType>& rhs);
+	explicit Point(const Point<differentType>& rhs);
 
 	dataType& operator[](int i){ return m_data[i]; }
 
 	const dataType operator[](int i) const{ return m_data[i]; }
+
+	Point<dataType>& operator=(const Point<dataType>&rhs){ m_data = rhs.m_data; return *this; }
+	Point<dataType>& operator=(Point<dataType>&& rhs){ m_data = std::move(rhs.m_data); return *this;}
 
 	Point<dataType> operator+(const Point<dataType>& rhs) const;
 
@@ -90,7 +97,7 @@ public:
 
 	Point3D(double x, double y, double z, unsigned int index) : Point<double>(x, y, z), m_index(index), m_used(true){};
 
-	unsigned int getIndex();
+	unsigned int getIndex(){ return m_index; }
 
 	void setIndex(unsigned int index){ m_index = index; };
 
@@ -105,7 +112,7 @@ private:
 };
 
 #define POINT_CMP_FCT(lhs, rhs, op, outputType) \
-    outputType point; \
+	outputType point; \
     for(unsigned int i = 0; i < 3; ++i){ \
         point[i] = lhs[i] op rhs[i] ? lhs[i] : rhs[i]; \
     } \

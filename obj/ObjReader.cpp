@@ -24,10 +24,10 @@ void ObjReader::read(const std::string& filePath){
 			}else if(startsWith(line, "f ")){
 				line = line.substr(2, line.length() - 2);
 				removeStartAndTrailingWhiteSpaces(line);
-				while(line.find('/') != line.npos){
+				while(line.find('/') != std::string::npos){
 					auto pos = line.find('/');
 					auto nextPos = line.find(' ', pos);
-					nextPos = nextPos > pos ? nextPos : line.npos;
+					nextPos = nextPos > pos ? nextPos : std::string::npos;
 					line.erase(pos, nextPos - pos);
 				}
 				std::stringstream ss;
@@ -58,7 +58,7 @@ void ObjReader::removeStartAndTrailingWhiteSpaces(std::string& line){
 			--pos;
 		}
 		if(pos != line.length() - 1){
-			line.erase(pos, line.npos);
+			line.erase(pos, std::string::npos);
 		}
 	}
 }

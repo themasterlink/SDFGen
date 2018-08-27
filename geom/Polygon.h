@@ -11,9 +11,9 @@
 
 struct Plane {
 
-	Plane() {};
+	Plane() = default;
 
-	explicit Plane(dPoint normal, const dPoint& pointOnPlane) : m_normal(std::move(normal)){
+	explicit Plane(dPoint normal, const dPoint& pointOnPlane) : m_normal(std::move(normal)), m_dist(0.0){
 		calcNormalDist(pointOnPlane);
 	}
 
@@ -28,13 +28,33 @@ struct Plane {
 		m_dist = -dot(m_normal, pointOnPlane);
 	}
 
-	double getDist(const dPoint& point){
+	double getDist(const dPoint& point) const {
 		return dot(m_normal, point) - m_dist;
 	}
 
 	dPoint m_normal;
 
 	double m_dist;
+};
+
+struct Line {
+
+	Line() = default;
+
+	Line(Point3D& first, Point3D& second): m_first(&first), m_second(&second) {
+		m_normal = *m_second - *m_first;
+		m_normal.normalizeThis();
+		printVar(m_normal);
+	};
+
+	double getDist(const dPoint& toPoint){
+		const auto vecToPoint = *m_first - toPoint;
+		return (vecToPoint - m_normal * dot(vecToPoint, m_normal)).length();
+	}
+
+	Point3D* m_first;
+	Point3D* m_second;
+	dPoint m_normal;
 };
 
 class Polygon {
@@ -60,6 +80,7 @@ private:
 	Plane m_main;
 
 	std::array<Plane, 3> m_edgePlanes;
+	std::array<Line, 3> m_edgeLines;
 
 
 };
