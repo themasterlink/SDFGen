@@ -36,6 +36,8 @@
 #define printLine() \
 	std::cout << "In: " << printPrettyFunction() << std::endl; \
 
+#define printDivider() \
+	std::cout << "---------------------------------------------" << std::endl; \
 
 namespace Utility {
 	template<typename type>

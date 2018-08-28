@@ -32,11 +32,10 @@ double Polygon::calcDistance(const dPoint& point){
 				}
 			}
 		}else if(insideCounter == 2){
-			// dist to the point between the two lines
 			int usedPointIndex = -1;
 			for(unsigned int i = 0; i < 3; ++i){
 				if(newDists[i] >= 0){
-					usedPointIndex = i; // it is always the smallest number
+					usedPointIndex = i;
 					break;
 				}
 			}

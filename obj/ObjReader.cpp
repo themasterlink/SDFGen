@@ -11,6 +11,7 @@ void ObjReader::read(const std::string& filePath){
 	if(stream.is_open()){
 		std::string line;
 		while(std::getline(stream, line)){
+			std::string oldLine = line;
 			removeStartAndTrailingWhiteSpaces(line);
 			if(startsWith(line, "v ")){
 				Point3D p;
@@ -28,12 +29,29 @@ void ObjReader::read(const std::string& filePath){
 					nextPos = nextPos > pos ? nextPos : std::string::npos;
 					line.erase(pos, nextPos - pos);
 				}
+				int amountOfWhiteSpaces = 0;
+				for(unsigned int i = 0; i < line.length(); ++i){
+					if(line[i] == ' '){
+						++amountOfWhiteSpaces;
+					}
+				}
 				std::stringstream ss;
 				ss << line;
 				iPoint pointIds;
 				ss >> pointIds;
 				m_polygons.emplace_back(pointIds, m_points);
 				m_box.addPolygon(m_polygons.back());
+				if(amountOfWhiteSpaces == 3){
+					iPoint newPoint;
+					ss >> newPoint;
+					newPoint[1] = newPoint[0];
+					newPoint[0] = pointIds[2];
+					newPoint[2] = pointIds[0];
+					m_polygons.emplace_back(pointIds, m_points);
+					m_box.addPolygon(m_polygons.back());
+				}else if(amountOfWhiteSpaces > 3){
+					printError("This is not supported here: " << line);
+				}
 			}
 		}
 		std::cout << m_box << std::endl;

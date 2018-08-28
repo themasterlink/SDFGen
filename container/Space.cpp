@@ -16,7 +16,7 @@ void Space::calcDists(std::vector<Polygon>& polys){
 				const dPoint point = getCenterOf(i,j,k);
 				double minDist = DBL_MAX;
 				for(auto& poly : polys){
-					double dist = poly.calcDistance(point);
+					double dist = fabs(poly.calcDistance(point));
 					minDist = std::min(dist, minDist);
 				}
 				m_data(i,j,k) = minDist;

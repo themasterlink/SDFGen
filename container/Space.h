@@ -17,6 +17,7 @@ public:
 
 	void calcDists(std::vector<Polygon>& polys);
 
+	double getI(unsigned int i, unsigned int j, unsigned int k) { return m_data(i,j,k); }
 
 
 private:
