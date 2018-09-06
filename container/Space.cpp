@@ -4,25 +4,43 @@
 
 #include <cfloat>
 #include "Space.h"
+#include "../util/StopWatch.h"
 
 
-void Space::calcDists(std::vector<Polygon>& polys){
+void Space::calcDists(Polygons& polys){
 	printVar(polys.size());
+	std::vector<double> sizes;
+	sizes.reserve(polys.size());
+	for(auto& poly : polys){
+		sizes.push_back(poly.size());
+	}
+	std::vector<unsigned int> used;
+	for(unsigned int i = 0; i < sizes.size(); ++i){
+		if(sizes[i] > 0.001){
+			used.emplace_back(i);
+		}
+	}
+	printVar(used.size());
+	StopWatch sw;
 	const auto size = m_data.getSize();
 	for(unsigned int i = 0; i < size[0]; ++i){
 		printVar(i);
 		for(unsigned int j = 0; j < size[1]; ++j){
 			for(unsigned int k = 0; k < size[2]; ++k){
-				const dPoint point = getCenterOf(i,j,k);
+				const dPoint point = getCenterOf(i, j, k);
 				double minDist = DBL_MAX;
-				for(auto& poly : polys){
-					double dist = fabs(poly.calcDistance(point));
-					minDist = std::min(dist, minDist);
+				for(const auto& index : used){
+					auto& poly = polys[index];
+					const double dist = poly.calcDistance(point);
+					if(fabs(dist) < fabs(minDist)){
+						minDist = dist;
+					}
 				}
-				m_data(i,j,k) = minDist;
+				m_data(i, j, k) = minDist;
 			}
 		}
 	}
+	printVar(sw.elapsed_time());
 }
 
 dPoint Space::getCenterOf(unsigned int i, unsigned int j, unsigned int k){

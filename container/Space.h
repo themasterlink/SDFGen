@@ -15,7 +15,7 @@ public:
 
 	Space(const uiPoint& iSize, const dPoint& origin, const dPoint& size): m_data(iSize), m_origin(origin), m_size(size) {};
 
-	void calcDists(std::vector<Polygon>& polys);
+	void calcDists(Polygons& polys);
 
 	double getI(unsigned int i, unsigned int j, unsigned int k) { return m_data(i,j,k); }
 

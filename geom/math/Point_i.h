@@ -58,4 +58,36 @@ Point<dataType> Point<dataType>::operator*(dataType rhs) const{
 	return {rhsOperatorFunctionSingle(*)};
 }
 
+template<typename dataType>
+Point<dataType>& Point<dataType>::operator/=(dataType rhs){
+	for(unsigned int i = 0; i < 3; ++i){
+		this->m_data[i] /= rhs;
+	}
+	return *this;
+}
+
+template<typename dataType>
+Point<dataType>& Point<dataType>::operator*=(dataType rhs){
+	for(unsigned int i = 0; i < 3; ++i){
+		this->m_data[i] *= rhs;
+	}
+	return *this;
+}
+
+template<typename dataType>
+Point<dataType>& Point<dataType>::operator+=(const Point<dataType>& rhs){
+	for(unsigned int i = 0; i < 3; ++i){
+		this->m_data[i] += rhs[i];
+	}
+	return *this;
+}
+
+template<typename dataType>
+Point<dataType>& Point<dataType>::operator-=(const Point<dataType>& rhs){
+	for(unsigned int i = 0; i < 3; ++i){
+		this->m_data[i] -= rhs[i];
+	}
+	return *this;
+}
+
 #endif //SDFGEN_POINT_I_H

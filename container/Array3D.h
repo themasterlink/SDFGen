@@ -6,7 +6,7 @@
 #define SDFGEN_ARRAY3D_H
 
 #include <vector>
-#include "../geom/Point.h"
+#include "../geom/math/Point.h"
 
 template<typename dataType>
 class Array3D {

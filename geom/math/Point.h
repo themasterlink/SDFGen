@@ -8,7 +8,7 @@
 #include <array>
 #include <iostream>
 #include <cmath>
-#include "../util/Utility.h"
+#include "../../util/Utility.h"
 
 template<typename dataType>
 class Point {
@@ -47,6 +47,14 @@ public:
 	Point<dataType> operator/(dataType rhs) const;
 
 	Point<dataType> operator*(dataType rhs) const;
+
+	Point<dataType>& operator/=(dataType rhs);
+
+	Point<dataType>& operator*=(dataType rhs);
+
+	Point<dataType>& operator+=(const Point<dataType>&rhs);
+
+	Point<dataType>& operator-=(const Point<dataType>&rhs);
 
 	Iterator begin(){ return m_data.begin(); }
 
@@ -97,11 +105,15 @@ public:
 
 	Point3D(double x, double y, double z, unsigned int index) : Point<double>(x, y, z), m_index(index), m_used(true){};
 
+	Point3D(const dPoint& p, unsigned int i): Point<double>(p), m_index(i), m_used(true){};
+
+	Point3D(const Point3D& rhs) : Point<double>(rhs[0], rhs[1], rhs[2]), m_index(0), m_used(rhs.m_used){};
+
 	unsigned int getIndex(){ return m_index; }
 
 	void setIndex(unsigned int index){ m_index = index; };
 
-	bool used(){ return m_used; }
+	bool used() const { return m_used; }
 
 	void setUsed(bool used){ m_used = used; }
 

@@ -8,7 +8,7 @@
 #include <string>
 #include <fstream>
 #include "../util/Utility.h"
-#include "../geom/Point.h"
+#include "../geom/math/Point.h"
 #include <vector>
 #include "../geom/Polygon.h"
 #include "../geom/BoundingBox.h"
@@ -19,13 +19,15 @@ public:
 
 	void read(const std::string& filePath);
 
-	std::vector<Polygon>& getPolygon(){ return m_polygons; }
+	Polygons& getPolygon(){ return m_polygons; }
 
 	BoundingBox& getBoundingBox() { return m_box; }
 
+	std::vector<Point3D>& getPoints() { return m_points;}
+
 private:
 	std::vector<Point3D> m_points;
-	std::vector<Polygon> m_polygons;
+	Polygons m_polygons;
 
 	BoundingBox m_box;
 
