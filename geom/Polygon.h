@@ -13,6 +13,7 @@
 #include "math/Transform.h"
 #include <fstream>
 #include <list>
+#import "BoundingBox.h"
 
 using Points = std::vector<Point3D>;
 
@@ -31,22 +32,29 @@ public:
 		return m_points;
 	}
 
+	double calcDistance3(const dPoint& point) const;
+
+	double calcDistanceConst(const dPoint& point) const;
+
 	double calcDistance(const dPoint& point);
 
 	double calcDistance2(const dPoint& point);
 
+	BoundingBox getBB() const {
+		BoundingBox box;
+		box.addPolygon(*this);
+		return box;
+	}
+
 	double size(){
 		const auto first = m_points[0] - m_points[1];
 		const auto second = m_points[2] - m_points[1];
-		const double d1 = first[1] * second[2] - first[2] * second[1];
-		const double d2 = first[2] * second[0] - first[0] * second[2];
-		const double d3 = first[0] * second[1] - first[1] * second[0];
-		return 0.5 * sqrt(d1 * d1 + d2 * d2 + d3 * d3);
+		return 0.5 * cross(first, second).length();
 	}
 
-private:
-
 	void calcNormal();
+
+private:
 
 	Points m_points;
 

@@ -76,17 +76,17 @@ Point<dataType>& Point<dataType>::operator*=(dataType rhs){
 
 template<typename dataType>
 Point<dataType>& Point<dataType>::operator+=(const Point<dataType>& rhs){
-	for(unsigned int i = 0; i < 3; ++i){
-		this->m_data[i] += rhs[i];
-	}
+	this->m_data[0] += rhs[0];
+	this->m_data[1] += rhs[1];
+	this->m_data[2] += rhs[2];
 	return *this;
 }
 
 template<typename dataType>
 Point<dataType>& Point<dataType>::operator-=(const Point<dataType>& rhs){
-	for(unsigned int i = 0; i < 3; ++i){
-		this->m_data[i] -= rhs[i];
-	}
+	this->m_data[0] -= rhs[0];
+	this->m_data[1] -= rhs[1];
+	this->m_data[2] -= rhs[2];
 	return *this;
 }
 

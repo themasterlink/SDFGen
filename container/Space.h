@@ -22,12 +22,21 @@ public:
 
 private:
 
+	void internCalcDist(const Polygons& polys, unsigned int start, unsigned int end, const std::vector<unsigned int>& used);
+
+	void internCalcDistForPoly(const Polygons& polys, const unsigned int startNot, const unsigned int endNot,
+									  const std::vector<unsigned int>& notUsed);
+
 	dPoint getCenterOf(unsigned int i, unsigned int j, unsigned int k);
+
+	iPoint getIndexOf(const dPoint& point) const;
 
 	Array3D<double> m_data;
 
 	dPoint m_origin;
 	dPoint m_size;
+
+	std::mutex m_mutex;
 
 };
 

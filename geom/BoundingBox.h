@@ -7,7 +7,8 @@
 
 
 #include "math/Point.h"
-#include "Polygon.h"
+
+class Polygon;
 
 class BoundingBox {
 public:
@@ -26,18 +27,22 @@ public:
 		return true;
 	}
 
-	void addPolygon(const Polygon& poly){
-		for(const auto& point : poly.getPoints()){
-			if(point.used()){
-				addPoint(point);
-			}
-		}
-	}
+	void addPolygon(const Polygon& poly);
 
 	template<typename dataType>
 	void addPoint(const Point<dataType>& point){
 		m_min = eMin(m_min, point);
 		m_max = eMax(m_max, point);
+	}
+
+	template<typename dataType>
+	void expandBy(const Point<dataType> & point){
+		m_min -= point;
+		m_max += point;
+	}
+
+	double getDiagonalLength() const {
+		return (m_max - m_min).length();
 	}
 
 	const dPoint& min() const{

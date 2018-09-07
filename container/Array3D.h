@@ -17,13 +17,15 @@ public:
 
 	explicit Array3D(const uiPoint& size);
 
+	~Array3D() = default;
+
 	dataType& operator()(unsigned int i, unsigned int j, unsigned int k);
 
 	const dataType& operator()(unsigned int i, unsigned int j, unsigned int k) const;
 
 	void setSize(const uiPoint& size);
 
-	const uiPoint& getSize(){ return m_size; }
+	const uiPoint& getSize() const { return m_size; }
 
 	InternalStorage& getData(){ return m_data; }
 

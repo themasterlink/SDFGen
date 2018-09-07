@@ -280,7 +280,7 @@ int main(int argc, char** argv){
 
 	BoundingBox& box = reader.getBoundingBox();
 	unsigned int res = 128;
-	Space space({res, res, res}, box.min(), box.max() - box.min());
+	Space space({res, res, res}, d_negOnes, d_ones * 2);
 	space.calcDists(newPolys);
 
 	std::ofstream output("/tmp/output_file.txt", std::ios::out);
