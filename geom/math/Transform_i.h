@@ -129,9 +129,8 @@ void Transform<dataType>::transform(Point<otherType>& point) const{
 		value += at(i, 3);
 		if(i < 3){
 			res[i] = value;
-		}else if(value > 1e-5){
+		}else if(fabs(value) > 1e-5){
 			res /= value; // divide by the w, to normalize it again
-			minMaxValue.add(fabs(value));
 		}else{
 			printError("This is dangerous");
 		}

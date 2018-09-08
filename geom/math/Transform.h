@@ -10,7 +10,6 @@
 #include "MinMaxValue.h"
 #include <cfloat>
 
-static MinMaxValue<double> minMaxValue(DBL_MAX, DBL_MIN);
 
 template<typename dataType>
 class Transform {

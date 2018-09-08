@@ -151,10 +151,14 @@ static Point<dataType> eMin(const Point<dataType>& lhs, const Point<differentTyp
 }
 
 template<typename dataType, typename differentType>
+static Point<dataType> eMultiply(const Point<dataType>& lhs, const Point<differentType>& rhs){
+	return {lhs[0] * rhs[0], lhs[1] * rhs[1], lhs[2] * rhs[2]};
+}
+
+template<typename dataType, typename differentType>
 static Point<dataType> eDivide(const Point<dataType>& lhs, const Point<differentType>& rhs){
     return {lhs[0] / rhs[0], lhs[1] / rhs[1], lhs[2] / rhs[2]};
 }
-
 
 template<typename dataType, typename differentType>
 static Point<dataType> eMinEqual(const Point<dataType>& lhs, const Point<differentType>& rhs){

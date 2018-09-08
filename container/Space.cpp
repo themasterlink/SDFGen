@@ -3,7 +3,6 @@
 //
 
 #include <cfloat>
-#include <thread>
 #include "Space.h"
 #include "../util/StopWatch.h"
 #include "../geom/math/AvgNumber.h"
@@ -14,7 +13,7 @@ void Space::internCalcDist(const Polygons& polys, unsigned int start, unsigned i
 
 	const auto size = m_data.getSize();
 	for(unsigned int i = start; i < end; ++i){
-		printVar(i);
+		//printVar(i);
 		for(unsigned int j = 0; j < size[1]; ++j){
 			for(unsigned int k = 0; k < size[2]; ++k){
 				const dPoint point = getCenterOf(i, j, k);
@@ -34,20 +33,29 @@ void Space::internCalcDist(const Polygons& polys, unsigned int start, unsigned i
 
 void Space::internCalcDistForPoly(const Polygons& polys, const unsigned int startNot, const unsigned int endNot,
 								  const std::vector<unsigned int>& notUsed){
+	Array3D<double> temp(m_data.getSize());
+	iPoint globalStart(m_data.getSize());
+	iPoint globalEnd{0,0,0};
 	for(unsigned int l = startNot; l < endNot; ++l){
 		const unsigned int index = notUsed[l];
 		const auto& poly = polys[index];
 		auto bb = poly.getBB();
-		const double diagonal = bb.getDiagonalLength();
-		const double factor = 3;
-		bb.expandBy(dPoint{diagonal * factor, diagonal * factor, diagonal * factor});
+		const dPoint bbSize = bb.getSize();
+		dPoint expandBB;
+		const double minSize = 0.3;
+		for(unsigned int i = 0; i < 3; ++i){
+			if(bbSize[i] < minSize){
+				expandBB[i] = minSize - bbSize[i];
+			}
+		}
+		bb.expandBy(expandBB);
 		iPoint start = getIndexOf(bb.min());
 		iPoint end = getIndexOf(bb.max());
 		unsigned int desiredSize = 50;
 		for(unsigned int repeat = 0; repeat < desiredSize - 1; ++repeat){
 			for(unsigned int i = 0; i < 3; ++i){
 				if(end[i] - start[i] < desiredSize){
-					if(end[i] < m_data.getSize()[i]){
+					if(end[i] < m_data.getSize()[i] - 1){
 						end[i] += 1;
 					}
 					if(start[i] > 0){
@@ -56,36 +64,34 @@ void Space::internCalcDistForPoly(const Polygons& polys, const unsigned int star
 				}
 			}
 		}
-		Array3D<double>* ptemp = new Array3D<double>(uiPoint(end - start + i_ones));
-		Array3D<double>& temp = *ptemp;
 		for(int i = start[0]; i <= end[0]; ++i){
 			for(int j = start[1]; j <= end[1]; ++j){
 				for(int k = start[2]; k <= end[2]; ++k){
 					const dPoint point = getCenterOf(i, j, k);
 					const double dist = poly.calcDistanceConst(point);
-					if(fabs(dist) < fabs(temp(i - start[0], j - start[1], k - start[2]))){
-						temp(i - start[0], j - start[1], k - start[2]) = dist;
+					if(fabs(dist) < fabs(temp(i, j, k))){
+						temp(i, j, k) = dist;
 					}
 				}
 			}
 		}
-		m_mutex.lock();
-		for(int i = start[0]; i <= end[0]; ++i){
-			for(int j = start[1]; j <= end[1]; ++j){
-				for(int k = start[2]; k <= end[2]; ++k){
-					if(fabs(temp(i - start[0], j - start[1], k - start[2])) < fabs(m_data(i,j,k))){
-						m_data(i,j,k) = temp(i - start[0], j - start[1], k - start[2]);
-					}
-				}
-			}
-		}
-		m_mutex.unlock();
-		delete(ptemp);
+		globalStart = eMin(globalStart, start);
+		globalEnd = eMax(globalEnd, end);
 	}
+	m_mutex.lock();
+	for(int i = globalStart[0]; i <= globalEnd[0]; ++i){
+		for(int j = globalStart[1]; j <= globalEnd[1]; ++j){
+			for(int k = globalStart[2]; k <= globalEnd[2]; ++k){
+				if(fabs(temp(i, j, k)) < fabs(m_data(i,j,k))){
+					m_data(i,j,k) = temp(i, j, k);
+				}
+			}
+		}
+	}
+	m_mutex.unlock();
 }
 
 void Space::calcDists(Polygons& polys){
-	printVar(polys.size());
 	std::vector<unsigned int> used;
 	std::vector<unsigned int> notUsed;
 	for(unsigned int i = 0; i < polys.size(); ++i){
@@ -95,7 +101,7 @@ void Space::calcDists(Polygons& polys){
 			notUsed.emplace_back(i);
 		}
 	}
-	printVar(used.size());
+	printVars(polys.size(), used.size());
 	StopWatch sw;
 	const auto size = m_data.getSize();
 	for(auto& poly : polys){
@@ -145,6 +151,6 @@ dPoint Space::getCenterOf(unsigned int i, unsigned int j, unsigned int k){
 }
 
 iPoint Space::getIndexOf(const dPoint& point) const{
-	const iPoint id = iPoint(eDivide(point - m_origin, m_size));
+	const iPoint id = iPoint(eMultiply(eDivide(point - m_origin, m_size), m_data.getSize()));
 	return eMin(eMax(iPoint{0, 0, 0}, id), iPoint(m_data.getSize()) - iPoint(1, 1, 1));
 }

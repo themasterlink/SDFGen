@@ -41,8 +41,10 @@ public:
 		m_max += point;
 	}
 
+	dPoint getSize() const { return m_max - m_min; }
+
 	double getDiagonalLength() const {
-		return (m_max - m_min).length();
+		return getSize().length();
 	}
 
 	const dPoint& min() const{

@@ -8,7 +8,7 @@
 
 #include "Array3D.h"
 #include "../geom/Polygon.h"
-
+#include <thread>
 
 class Space {
 public:
