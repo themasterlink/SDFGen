@@ -10,7 +10,6 @@
 
 void Space::internCalcDist(const Polygons& polys, unsigned int start, unsigned int end,
 						   const std::vector<unsigned int>& used){
-
 	const auto size = m_data.getSize();
 	for(unsigned int i = start; i < end; ++i){
 		//printVar(i);
@@ -115,9 +114,7 @@ void Space::calcDists(Polygons& polys){
 		if(i + 1 == amountOfThreads){
 			end = size[0];
 		}
-		threads.emplace_back([=]{
-			this->internCalcDist(polys, start, end, used);
-		});
+		threads.emplace_back(std::thread(&Space::internCalcDist, std::ref(*this), std::ref(polys), start, end, std::ref(used)));
 	}
 	for(auto& thread : threads){
 		thread.join();
@@ -131,9 +128,7 @@ void Space::calcDists(Polygons& polys){
 		if(i + 1 == amountOfThreads){
 			end = notUsed.size();
 		}
-		threads2.emplace_back([=]{
-			this->internCalcDistForPoly(polys, start, end, notUsed);
-		});
+		threads2.emplace_back(std::thread(&Space::internCalcDistForPoly, std::ref(*this), std::ref(polys), start, end, std::ref(notUsed)));
 	}
 	for(auto& thread : threads2){
 		thread.join();
