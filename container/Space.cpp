@@ -114,7 +114,7 @@ void Space::calcDists(Polygons& polys){
 		if(i + 1 == amountOfThreads){
 			end = size[0];
 		}
-		threads.emplace_back(std::thread(&Space::internCalcDist, std::ref(*this), std::ref(polys), start, end, std::ref(used)));
+		threads.emplace_back(std::thread(&Space::internCalcDist, this, std::cref(polys), start, end, std::cref(used)));
 	}
 	for(auto& thread : threads){
 		thread.join();
@@ -128,7 +128,7 @@ void Space::calcDists(Polygons& polys){
 		if(i + 1 == amountOfThreads){
 			end = notUsed.size();
 		}
-		threads2.emplace_back(std::thread(&Space::internCalcDistForPoly, std::ref(*this), std::ref(polys), start, end, std::ref(notUsed)));
+		threads2.emplace_back(std::thread(&Space::internCalcDistForPoly, this, std::cref(polys), start, end, std::cref(notUsed)));
 	}
 	for(auto& thread : threads2){
 		thread.join();
