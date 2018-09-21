@@ -60,53 +60,32 @@ double Polygon::calcDistance3(const dPoint& point) const {
 }
 
 double Polygon::calcDistanceConst(const dPoint& point) const{
+	const double planeDist = m_main.getDist(point);
+	const double desiredSign = 1; //sgn(planeDist);
+	const double zeroVal = 0.000;
 	for(unsigned int currentEdgeId = 0; currentEdgeId < 3; ++currentEdgeId){
 		const double dist = m_edgePlanes[currentEdgeId].getDist(point);
-		if(dist < 0.0){ // is outside
+		if(dist < zeroVal){ // is outside
 			const double firstBorder = m_borderPlanes[currentEdgeId][0].getDist(point);
 			const double secondBorder = m_borderPlanes[currentEdgeId][1].getDist(point);
-			if(firstBorder < 0.0){
+			if(firstBorder < zeroVal){
 				// use the point dist to the first point
-				return (point - m_borderPlanes[currentEdgeId][0].m_pointOnPlane).length();
-			}else if(secondBorder < 0.0){
+				return desiredSign * (point - m_borderPlanes[currentEdgeId][0].m_pointOnPlane).length();
+			}else if(secondBorder < zeroVal){
 				// use the point dist to second point
-				return (point - m_borderPlanes[currentEdgeId][1].m_pointOnPlane).length();
+				return desiredSign * (point - m_borderPlanes[currentEdgeId][1].m_pointOnPlane).length();
 			}else{
 
-				return m_edgeLines[currentEdgeId].getDist(point);
+				return desiredSign * m_edgeLines[currentEdgeId].getDist(point);
 			}
 		}
 	}
-	return m_main.getDist(point);
+	return planeDist;
 }
 
 double Polygon::calcDistance(const dPoint& point){
 	if(m_calcNormal){
 		return calcDistanceConst(point);
-
-//		int insideCounter = 0;
-//		for(const auto& val : newDists){
-//			if(val < 0){
-//				++insideCounter;
-//			}
-//		}
-//		if(insideCounter == 1){
-//			for(unsigned int i = 0; i < 3; ++i){
-//				if(newDists[i] < 0){
-//					return m_edgeLines[i].getDist(point);
-//				}
-//			}
-//		}else if(insideCounter == 2){
-//			int usedPointIndex = -1;
-//			for(unsigned int i = 0; i < 3; ++i){
-//				if(newDists[i] >= 0){
-//					usedPointIndex = i;
-//					break;
-//				}
-//			}
-//			return (point - m_points[usedPointIndex]).length();
-//		}
-//		return dist;
 	}else{
 		calcNormal();
 		if(m_calcNormal){
@@ -325,7 +304,7 @@ Polygons removePolygonsOutOfFrustum(Polygons& polys){
 		if(isIn){
 			newPolys.emplace_back(polys[i].getPoints());
 		}else{
-			const double dist = polys[i].calcDistance(d_zeros);
+			const double dist = fabs(polys[i].calcDistance(d_zeros));
 			if(dist <= M_SQRT2){
 				newPolys.emplace_back(polys[i].getPoints());
 			}

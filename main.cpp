@@ -17,7 +17,31 @@ struct CamPoses {
 
 
 int main(int argc, char** argv){
-	PolygonTest::testAll();
+	ObjReader r;
+	r.read("/home_local/denn_ma/dataForSceneLearning/SUNCG/object/620/620.obj");
+	auto box = r.getBoundingBox();
+	const unsigned int res = 128;
+	Space space({res, res, res}, box.min(), box.getSize());
+	space.calcDists(r.getPolygon());
+
+	const std::string outputFilePath = "/dev/shm/output_file_1.txt";
+	std::ofstream output(outputFilePath, std::ios::out);
+	if(output.is_open()){
+		output << res << "\n";
+		for(unsigned int i = 0; i < res; ++i){
+			for(unsigned int j = 0; j < res; ++j){
+				for(unsigned int k = 0; k < res; ++k){
+					output << space.getI(i, j, k) << "\n";
+				}
+			}
+		}
+		printMsg("Save output file!");
+	}else{
+		printError("The output file can not be opened!");
+	}
+	output.close();
+	return 0;
+//	PolygonTest::testAll();
 	TCLAP::CmdLine cmd("Generate Voxels passed on a list of camera postions and an .obj file", ' ',
 					   "1.0");
 	const bool required = true;
@@ -26,7 +50,8 @@ int main(int argc, char** argv){
 	TCLAP::ValueArg<std::string> cameraPositionsFile("c", "cameraPosFile",
 													 "File path to camera position file", required,
 													 "", "string");
-	TCLAP::ValueArg<std::string> outputFolder("f", "folder", "Folder path for output files", required, "", "string");
+	TCLAP::ValueArg<std::string> outputFolder("f", "folder", "Folder path for output files",
+											  required, "", "string");
 	cmd.add(objFile);
 	cmd.add(cameraPositionsFile);
 	cmd.add(outputFolder);
@@ -74,7 +99,11 @@ int main(int argc, char** argv){
 	reader.read(objFile.getValue());
 	int camPoseCounter = 0;
 	for(const auto& camPose : camPoses){
-	//auto camPose = camPoses[camPoses.size() - 1];
+		if(camPoseCounter == 0){
+			++camPoseCounter;
+			continue;
+		}
+		//auto camPose = camPoses[camPoses.size() - 1];
 		Polygons polygons = reader.getPolygon();
 		printVars(camPose.camPos, camPose.towardsPose);
 		dTransform camTrans;
@@ -128,7 +157,8 @@ int main(int argc, char** argv){
 						}
 					}
 					dPoint firstCut = nearClippingPlane.intersectionPoint(lines[(notUsed + 1) % 3]);
-					dPoint secondCut = nearClippingPlane.intersectionPoint(lines[(notUsed + 2) % 3]);
+					dPoint secondCut = nearClippingPlane.intersectionPoint(
+							lines[(notUsed + 2) % 3]);
 					Point3D firstCut3D(firstCut, 0);
 					Point3D secondCut3D(secondCut, 0);
 					Points p1 = {points[notUsed], points[(notUsed + 1) % 3], firstCut3D};
@@ -161,13 +191,15 @@ int main(int argc, char** argv){
 
 		newPolys = removePolygonsOutOfFrustum(newPolys);
 
+		writeToDisc(newPolys, "/tmp/test.obj");
 
 		BoundingBox& box = reader.getBoundingBox();
 		const unsigned int res = 128;
 		Space space({res, res, res}, d_negOnes, d_ones * 2);
 		space.calcDists(newPolys);
 
-		const std::string outputFilePath = outputFolder.getValue() + "/output_" + Utility::toString(camPoseCounter) + ".txt";
+		const std::string outputFilePath =
+				outputFolder.getValue() + "/output_" + Utility::toString(camPoseCounter) + ".txt";
 		std::ofstream output(outputFilePath, std::ios::out);
 		if(output.is_open()){
 			output << res << "\n";

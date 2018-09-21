@@ -5,9 +5,13 @@
 #ifndef SDFGEN_PLANE_H
 #define SDFGEN_PLANE_H
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
+template <typename T>
+int sgn(T val) {
+    return (T(0) <= val) - (val < T(0));
 }
+
+#include "math/Point.h"
+#include "Line.h"
 
 struct Plane {
 

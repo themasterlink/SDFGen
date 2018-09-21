@@ -12,7 +12,7 @@ void Space::internCalcDist(const Polygons& polys, unsigned int start, unsigned i
 						   const std::vector<unsigned int>& used){
 	const auto size = m_data.getSize();
 	for(unsigned int i = start; i < end; ++i){
-		//printVar(i);
+		printVar(i);
 		for(unsigned int j = 0; j < size[1]; ++j){
 			for(unsigned int k = 0; k < size[2]; ++k){
 				const dPoint point = getCenterOf(i, j, k);
@@ -33,6 +33,7 @@ void Space::internCalcDist(const Polygons& polys, unsigned int start, unsigned i
 void Space::internCalcDistForPoly(const Polygons& polys, const unsigned int startNot, const unsigned int endNot,
 								  const std::vector<unsigned int>& notUsed){
 	Array3D<double> temp(m_data.getSize());
+	temp.fill(DBL_MAX);
 	iPoint globalStart(m_data.getSize());
 	iPoint globalEnd{0,0,0};
 	for(unsigned int l = startNot; l < endNot; ++l){
@@ -41,7 +42,7 @@ void Space::internCalcDistForPoly(const Polygons& polys, const unsigned int star
 		auto bb = poly.getBB();
 		const dPoint bbSize = bb.getSize();
 		dPoint expandBB;
-		const double minSize = 0.3;
+		const double minSize = 1.0;
 		for(unsigned int i = 0; i < 3; ++i){
 			if(bbSize[i] < minSize){
 				expandBB[i] = minSize - bbSize[i];
@@ -94,7 +95,7 @@ void Space::calcDists(Polygons& polys){
 	std::vector<unsigned int> used;
 	std::vector<unsigned int> notUsed;
 	for(unsigned int i = 0; i < polys.size(); ++i){
-		if(polys[i].size() > 0.001){
+		if(polys[i].size() > 0.001 || true){
 			used.emplace_back(i);
 		}else{
 			notUsed.emplace_back(i);
@@ -106,29 +107,43 @@ void Space::calcDists(Polygons& polys){
 	for(auto& poly : polys){
 		poly.calcNormal();
 	}
-	const unsigned int amountOfThreads = std::thread::hardware_concurrency();
+	unsigned int amountOfThreads = std::thread::hardware_concurrency();
 	std::vector<std::thread> threads;
-	for(unsigned int i = 0; i < amountOfThreads; ++i){
-		unsigned int start = (unsigned int) (i * size[0] / (float) amountOfThreads);
-		unsigned int end = (unsigned int) ((i + 1) * size[0] / (float) amountOfThreads);
-		if(i + 1 == amountOfThreads){
-			end = size[0];
+	if(used.size() > 0){
+		amountOfThreads = std::min(amountOfThreads, (unsigned int) used.size());
+		for(unsigned int i = 0; i < amountOfThreads; ++i){
+			unsigned int start = (unsigned int) (i * size[0] / (float) amountOfThreads);
+			unsigned int end = (unsigned int) ((i + 1) * size[0] / (float) amountOfThreads);
+			if(i + 1 == amountOfThreads){
+				end = size[0];
+			}
+			threads.emplace_back(
+					std::thread(&Space::internCalcDist, this, std::cref(polys), start, end,
+								std::cref(used)));
 		}
-		threads.emplace_back(std::thread(&Space::internCalcDist, this, std::cref(polys), start, end, std::cref(used)));
+	}else{
+		m_data.fill(DBL_MAX);
 	}
 	for(auto& thread : threads){
 		thread.join();
 	}
 	printVar(sw.elapsed_time());
+	return;
 	StopWatch swForSmallerPolys;
+	amountOfThreads = std::thread::hardware_concurrency();
 	std::vector<std::thread> threads2;
-	for(unsigned int i = 0; i < amountOfThreads; ++i){
-		unsigned int start = (unsigned int) (i * notUsed.size() / (float) amountOfThreads);
-		unsigned int end = (unsigned int) ((i + 1) * notUsed.size() / (float) amountOfThreads);
-		if(i + 1 == amountOfThreads){
-			end = notUsed.size();
+	if(notUsed.size() > 0){
+		amountOfThreads = std::min(amountOfThreads, (unsigned int) notUsed.size());
+		for(unsigned int i = 0; i < amountOfThreads; ++i){
+			unsigned int start = (unsigned int) (i * notUsed.size() / (float) amountOfThreads);
+			unsigned int end = (unsigned int) ((i + 1) * notUsed.size() / (float) amountOfThreads);
+			if(i + 1 == amountOfThreads){
+				end = notUsed.size();
+			}
+			threads2.emplace_back(
+					std::thread(&Space::internCalcDistForPoly, this, std::cref(polys), start, end,
+								std::cref(notUsed)));
 		}
-		threads2.emplace_back(std::thread(&Space::internCalcDistForPoly, this, std::cref(polys), start, end, std::cref(notUsed)));
 	}
 	for(auto& thread : threads2){
 		thread.join();

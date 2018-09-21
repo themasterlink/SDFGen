@@ -32,4 +32,11 @@ const dataType& Array3D<dataType>::operator()(unsigned int i, unsigned int j, un
 	return m_data[getInternVal(i,j,k)];
 }
 
+template<typename dataType>
+void Array3D<dataType>::fill(const dataType& defaultValue){
+	for(unsigned int i = 0; i < m_data.size(); ++i){
+		m_data[i] = defaultValue;
+	}
+}
+
 #endif //SDFGEN_ARRAY3D_I_H

@@ -64,7 +64,7 @@ void PolygonTest::testPolygonInPlane(){
 	}
 	if(!worked){
 		printError("One of the test failed! Stop execution!");
-		//exit(1);
+		exit(1);
 	}
 
 

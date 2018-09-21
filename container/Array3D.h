@@ -27,6 +27,8 @@ public:
 
 	const uiPoint& getSize() const { return m_size; }
 
+	void fill(const dataType& defaultValue);
+
 	InternalStorage& getData(){ return m_data; }
 
 	Iterator begin(){ return m_data.begin(); }
